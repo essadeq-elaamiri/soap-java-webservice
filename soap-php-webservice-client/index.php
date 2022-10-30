@@ -3,6 +3,7 @@
     $result = 0;
     $accounts = [];
     $accounts_soap_res= null;
+    $account ;
     $WSDL = "http://localhost:9292/BankWS/?wsdl";
 
     if(isset($_POST["get_accounts"])){
@@ -10,20 +11,23 @@
         $client_soap = new SoapClient($WSDL);
         $accounts_soap_res = $client_soap->__soapCall("getAccounts", []/*args*/);  
         // function with thesame name in the WSDL
-        return;
-    }
-
-    if(isset($_POST["amount"])){
-        $amout = $_POST["amount"];
         
-        $client_soap = new SoapClient($WSDL);
-
-        $param = new stdClass(); // standard class
-        $param->amount=$amout; //adding param
-        $res = $client_soap->__soapCall("covert", [$param]/*args*/); // call a soap function
-        $result = $res->return; //  access the return attribute of the soap object returned
     }
+    else{
+        if(isset($_POST["amount"])){
+            $amout = $_POST["amount"];
+            
+            $client_soap = new SoapClient($WSDL);
     
+            $param = new stdClass(); // standard class
+            $param->amount=$amout; //adding param
+            $res = $client_soap->__soapCall("covert", [$param]/*args*/); // call a soap function
+            $result = $res->return; //  access the return attribute of the soap object returned
+        }
+        
+    }
+
+   
 ?>
 
 <!DOCTYPE html>
@@ -68,17 +72,17 @@
 
     </form>
     <?if(isset($accounts_soap_res)) :?>
-        <table style="width: 50% ; margin:auto; border: 1px solid #111;">
+        <table style="width: 50% ; margin:auto; border: 1px solid #111;" >
             <tr>
                 <td>Code</td>
                 <td>Amount</td>
             </tr>
-            <?foreach($accounts_soap_res?->return as $account):?>
-            <tr>
-                <td><?=$account?->code?></td>
-                <td><?=$account?->amount?></td>
-            </tr>
-            <?endforeach?>
+            <?php foreach($accounts_soap_res?->return as $account){?>
+                <tr>
+                    <td><?=$account?->code?></td>
+                    <td><?=$account?->balance?></td>
+                </tr>
+            <?php }?>
         </table>
     <?endif?>
 </body>
